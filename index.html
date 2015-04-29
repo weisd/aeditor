@@ -1,0 +1,57 @@
+<!doctype html>
+<link rel="stylesheet" href="js/hljs/styles/monokai_sublime.css">
+
+<textarea id="textarea" style="width:800px;height:500px"></textarea>
+<div id="preview"></div>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/marked/marked.min.js"></script>
+<script src="js/hljs/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+	marked.setOptions({
+		highlight: function (code) {
+		    var d = hljs.highlightAuto(code).value;
+		    console.log(d)
+		    return d;
+		  }
+	});
+</script>
+<script >
+	(function ($) {
+		$.event.special.valuechange = {
+
+		  teardown: function (namespaces) {
+		    $(this).unbind('.valuechange');
+		  },
+
+		  handler: function (e) {
+		    $.event.special.valuechange.triggerChanged($(this));
+		  },
+
+		  add: function (obj) {
+		    $(this).on('keyup.valuechange cut.valuechange paste.valuechange input.valuechange', obj.selector, $.event.special.valuechange.handler)
+		  },
+
+		  triggerChanged: function (element) {
+		    var current = element[0].contentEditable === 'true' ? element.html() : element.val()
+		      , previous = typeof element.data('previous') === 'undefined' ? element[0].defaultValue : element.data('previous')
+		    if (current !== previous) {
+		      element.trigger('valuechange', [element.data('previous')])
+		      element.data('previous', current)
+		    }
+		  }
+		}
+		$(function(){
+			$('#textarea').on('valuechange', function(e){
+				var val = $(this).val();
+				console.log()
+				$('#preview').html(marked(val));
+				$('#preview code').addClass('hljs');
+			})
+
+
+		})
+
+
+	})(jQuery)
+</script>
